@@ -9,18 +9,32 @@ import (
 
 const VerifyButton = "verify"
 
-func (h *Handlers) OnUserJoined(m *tgbotapi.Message) {
-	userIsAdmin := c.IsAdmin(m, h.bot, h.logger)
+var (
+	newUserChatID int64
+	newUserID     int64
+	isUserHuman   bool = false
+)
 
-	fmt.Println("We are here:")
+func (h *Handlers) HandleNewUser(m *tgbotapi.Message, query *tgbotapi.CallbackQuery) {
+	switch {
+	case m != nil:
+		h.onUserJoined(m)
+	case query != nil:
+		h.handleButton(query)
+	}
+}
+
+func (h *Handlers) onUserJoined(m *tgbotapi.Message) {
+	userIsAdmin := c.IsAdmin(m, h.bot, h.logger)
 
 	for _, user := range m.NewChatMembers {
 		username := c.GetUsername(&user)
-		chatID := m.Chat.ID
+		newUserChatID = m.Chat.ID
+		newUserID = user.ID
 
 		h.logger.Infof("New user joined: %v", username)
 		if user.IsBot {
-			isBotAllowed, err := h.botIsAllowedToJoin(m, user, userIsAdmin, username, chatID)
+			isBotAllowed, err := h.botIsAllowedToJoin(m, user, userIsAdmin, username, newUserChatID)
 			if err != nil {
 				h.logger.Errorf("Error checking if user is bot: %v", err)
 				return
@@ -39,42 +53,39 @@ func (h *Handlers) OnUserJoined(m *tgbotapi.Message) {
 
 		verifyUserMsgText := h.getVerifyUserMsgText(username, m.Chat.Title)
 
-		msg := tgbotapi.NewMessage(chatID, verifyUserMsgText)
+		msg := tgbotapi.NewMessage(newUserChatID, verifyUserMsgText)
 		msg.ReplyMarkup = keyboard
 
-		sentMsg, err := h.bot.Send(msg)
+		_, err := h.bot.Send(msg)
 		if err != nil {
 			h.logger.Errorf("Error sending message: %v", err)
 			return
 		}
+	}
 
-		fmt.Println(sentMsg)
-
-		// if u.CallbackQuery != nil {
-		// 	go h.verifyNewUser(&u, sentMsg, username, &user)
-		// }
+	if m.From.ID == newUserID && !isUserHuman {
+		delMsg := tgbotapi.NewDeleteMessage(newUserChatID, m.MessageID)
+		_, err := h.bot.Request(delMsg)
+		if err != nil {
+			h.logger.Errorf("Error deleting message: %v", err)
+			return
+		}
 	}
 }
 
-// func (h *Handlers) verifyNewUser(
-// 	u *tgbotapi.Update,
-// 	sentMsg tgbotapi.Message,
-// 	username string,
-// 	user *tgbotapi.User) {
-// 	time.Sleep(8 * time.Second)
-// 	fmt.Println(user)
-//
-// 	callbackConfig := tgbotapi.CallbackConfig{
-// 		CallbackQueryID: u.CallbackQuery.ID,
-// 		Text:            "You are verified!",
-// 	}
-//
-// 	_, err := h.bot.Request(callbackConfig)
-// 	if err != nil {
-// 		h.logger.Errorf("Error sending callback config: %v", err)
-// 		return
-// 	}
-// }
+func (h *Handlers) handleButton(query *tgbotapi.CallbackQuery) {
+	if query.Data == VerifyButton && query.From.ID == newUserID {
+		delMsg := tgbotapi.NewDeleteMessage(newUserChatID, query.Message.MessageID)
+
+		_, err := h.bot.Request(delMsg)
+		if err != nil {
+			h.logger.Errorf("Error deleting message: %v", err)
+			return
+		}
+
+		isUserHuman = true
+	}
+}
 
 func (h *Handlers) getVerifyUserMsgText(username, chatTitle string) string {
 	verifyUserMsg := fmt.Sprintf("Hi %s, welcome to the %s! (You have %sec)\n"+
@@ -117,11 +128,4 @@ func (h *Handlers) botIsAllowedToJoin(
 	}
 
 	return true, nil
-}
-
-func (h *Handlers) HandleButton(query *tgbotapi.CallbackQuery) {
-	fmt.Println("We are here:")
-	if query.Data == VerifyButton {
-		fmt.Println("Hello from VerifyButton")
-	}
 }

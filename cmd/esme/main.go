@@ -29,8 +29,5 @@ func main() {
 		logger.Fatal("failed to start bot", zaplog.Error(err))
 	}
 
-	err = bot.Start()
-	if err != nil {
-		logger.Fatal("failed to start bot", zaplog.Error(err))
-	}
+	bot.Start()
 }

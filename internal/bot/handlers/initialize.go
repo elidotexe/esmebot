@@ -4,35 +4,23 @@ import (
 	"time"
 
 	"github.com/elidotexe/esme/internal/logger"
-	"github.com/elidotexe/esme/internal/storage"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 const DeleteMessageTime = time.Second * 30
 
 type Handlers struct {
-	bot     *tgbotapi.BotAPI
-	logger  *logger.Logger
-	storage *storage.MemoryStorage
+	bot    *tgbotapi.BotAPI
+	logger *logger.Logger
 }
 
 // Initialize initializes a new instance of the Handlers struct with the provided BotAPI
 // and Logger, and returns it along with a nil error.
-func Initialize(b *tgbotapi.BotAPI, logger *logger.Logger, storage *storage.MemoryStorage) (*Handlers, error) {
+func Initialize(b *tgbotapi.BotAPI, logger *logger.Logger) (*Handlers, error) {
 	return &Handlers{
-		bot:     b,
-		logger:  logger,
-		storage: storage,
+		bot:    b,
+		logger: logger,
 	}, nil
-}
-
-func (h *Handlers) HandleUpdate(u tgbotapi.Update) {
-	switch {
-	case u.Message.NewChatMembers != nil:
-		// h.OnUserJoined(u.Message)
-	case u.CallbackQuery.Data != "":
-		h.HandleButton(u.CallbackQuery)
-	}
 }
 
 // Helper functions
