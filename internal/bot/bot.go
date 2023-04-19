@@ -5,6 +5,7 @@ import (
 
 	"github.com/elidotexe/esme/internal/bot/handlers"
 	"github.com/elidotexe/esme/internal/logger"
+	"github.com/elidotexe/esme/internal/storage"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	zaplog "go.uber.org/zap"
 )
@@ -36,22 +37,13 @@ func NewBot(token string, logger *logger.Logger) (*Bot, error) {
 		Timeout: 60,
 	})
 
-	h, err := handlers.Initialize(bot, logger)
+	storage := storage.NewMemoryStorage()
+
+	h, err := handlers.Initialize(bot, logger, storage)
 	if err != nil {
 		logger.Error("Error initializing handlers", zaplog.Error(err))
 		return nil, err
 	}
-
-	keyboard := tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("Hello"),
-		),
-	)
-
-	msg := tgbotapi.NewMessage(-1001628672322, "Hello")
-	msg.ReplyMarkup = keyboard
-
-	bot.Send(msg)
 
 	b := &Bot{
 		bot:      bot,
@@ -71,7 +63,7 @@ func (b *Bot) Start() {
 
 	for u := range b.updates {
 		if u.CallbackQuery != nil {
-			b.handlers.HandleNewUser(u.Message, u.CallbackQuery)
+			b.handlers.HandleButtonQuery(u.Message, u.CallbackQuery)
 		}
 
 		switch {
@@ -80,10 +72,10 @@ func (b *Bot) Start() {
 		case u.Message.Command() == "info":
 			b.handlers.OnInfoCommand(u.Message)
 		case u.Message.NewChatMembers != nil:
-			b.handlers.HandleNewUser(u.Message, u.CallbackQuery)
+			b.handlers.OnUserJoined(u.Message)
 		default:
 			b.logger.Infof("%s, wrote: %s", u.Message.From.UserName, u.Message.Text)
-			b.handlers.HandleNewUser(u.Message, u.CallbackQuery)
+			b.handlers.HandleButtonQuery(u.Message, u.CallbackQuery)
 		}
 	}
 }

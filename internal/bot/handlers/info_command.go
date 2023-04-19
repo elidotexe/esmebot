@@ -35,5 +35,8 @@ func (h *Handlers) OnInfoCommand(ctx *tgbotapi.Message) {
 		}()
 	}
 
-	go h.DeleteMessage(chatID, sentMsg.MessageID)
+	go h.DeleteMessage(
+		chatID,
+		sentMsg.MessageID,
+		DeleteMsgDelayFiveMin)
 }

@@ -8,7 +8,7 @@ type Storage interface {
 	// Exist()
 }
 
-func NewStorage() *MemoryStorage {
+func NewMemoryStorage() *MemoryStorage {
 	m := MemoryStorage{}
 	m.pending = make(map[string]Info)
 	return &m

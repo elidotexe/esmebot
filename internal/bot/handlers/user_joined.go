@@ -2,39 +2,28 @@ package handlers
 
 import (
 	"fmt"
+	"time"
 
 	c "github.com/elidotexe/esme/internal/bot/common"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-const VerifyButton = "verify"
-
-var (
-	newUserChatID int64
-	newUserID     int64
-	isUserHuman   bool = false
-)
-
-func (h *Handlers) HandleNewUser(m *tgbotapi.Message, query *tgbotapi.CallbackQuery) {
-	switch {
-	case m != nil:
-		h.onUserJoined(m)
-	case query != nil:
-		h.handleButton(query)
-	}
-}
-
-func (h *Handlers) onUserJoined(m *tgbotapi.Message) {
-	userIsAdmin := c.IsAdmin(m, h.bot, h.logger)
-
+func (h *Handlers) OnUserJoined(m *tgbotapi.Message) {
 	for _, user := range m.NewChatMembers {
+		userIsAdmin := c.IsAdmin(m, h.bot, h.logger)
 		username := c.GetUsername(&user)
+
+		h.logger.Infof("New user joined: %v", username)
 		newUserChatID = m.Chat.ID
 		newUserID = user.ID
 
-		h.logger.Infof("New user joined: %v", username)
 		if user.IsBot {
-			isBotAllowed, err := h.botIsAllowedToJoin(m, user, userIsAdmin, username, newUserChatID)
+			isBotAllowed, err := h.botIsAllowedToJoin(
+				m,
+				user,
+				userIsAdmin,
+				username,
+				newUserChatID)
 			if err != nil {
 				h.logger.Errorf("Error checking if user is bot: %v", err)
 				return
@@ -45,55 +34,45 @@ func (h *Handlers) onUserJoined(m *tgbotapi.Message) {
 			}
 		}
 
-		keyboard := tgbotapi.NewInlineKeyboardMarkup(
-			tgbotapi.NewInlineKeyboardRow(
-				tgbotapi.NewInlineKeyboardButtonData("I am a Human", VerifyButton),
-			),
-		)
-
-		verifyUserMsgText := h.getVerifyUserMsgText(username, m.Chat.Title)
+		verifyUserMsgText := getVerifyUserMsgText(username, m.Chat.Title)
 
 		msg := tgbotapi.NewMessage(newUserChatID, verifyUserMsgText)
-		msg.ReplyMarkup = keyboard
+		msg.ReplyMarkup = verifyKeyboard
 
-		_, err := h.bot.Send(msg)
+		sentMsg, err := h.bot.Send(msg)
 		if err != nil {
 			h.logger.Errorf("Error sending message: %v", err)
 			return
 		}
+
+		time.AfterFunc(DeleteMsgDelayFiveMin, func() {
+			if !isUserHuman {
+				h.DeleteMessage(
+					newUserChatID,
+					sentMsg.MessageID,
+					DeleteMsgDelayZeroMin)
+
+				banChatMemberCfg := tgbotapi.BanChatMemberConfig{
+					ChatMemberConfig: tgbotapi.ChatMemberConfig{
+						ChatID: newUserChatID,
+						UserID: newUserID,
+					},
+					RevokeMessages: true,
+				}
+
+				h.bot.Request(banChatMemberCfg)
+			}
+		})
 	}
 
-	if m.From.ID == newUserID && !isUserHuman {
-		delMsg := tgbotapi.NewDeleteMessage(newUserChatID, m.MessageID)
-		_, err := h.bot.Request(delMsg)
-		if err != nil {
-			h.logger.Errorf("Error deleting message: %v", err)
-			return
-		}
-	}
+	go h.DeleteMessageFromUnverifiedUser(m)
 }
 
-func (h *Handlers) handleButton(query *tgbotapi.CallbackQuery) {
-	if query.Data == VerifyButton && query.From.ID == newUserID {
-		delMsg := tgbotapi.NewDeleteMessage(newUserChatID, query.Message.MessageID)
-
-		_, err := h.bot.Request(delMsg)
-		if err != nil {
-			h.logger.Errorf("Error deleting message: %v", err)
-			return
-		}
-
-		isUserHuman = true
-	}
-}
-
-func (h *Handlers) getVerifyUserMsgText(username, chatTitle string) string {
-	verifyUserMsg := fmt.Sprintf("Hi %s, welcome to the %s! (You have %sec)\n"+
+func getVerifyUserMsgText(username, chatTitle string) string {
+	return fmt.Sprintf("Hi %s, welcome to the %s! (You have %sec)\n"+
 		"\n"+
 		"Please, press the button below within the specified time frame, otherwise you "+
-		"will be kicked. Thank you!", username, chatTitle, DeleteMessageTime.String())
-
-	return verifyUserMsg
+		"will be kicked. Thank you!", username, chatTitle, DeleteMsgDelayFiveMin.String())
 }
 
 func (h *Handlers) botIsAllowedToJoin(
@@ -122,7 +101,10 @@ func (h *Handlers) botIsAllowedToJoin(
 			return false, err
 		}
 
-		go h.DeleteMessage(chatID, sentMsg.MessageID)
+		go h.DeleteMessage(
+			chatID,
+			sentMsg.MessageID,
+			DeleteMsgDelayFiveMin)
 
 		return false, nil
 	}
