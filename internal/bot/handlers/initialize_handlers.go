@@ -26,6 +26,8 @@ func Initialize(b *tgbotapi.BotAPI, logger *logger.Logger, s storage.Storage) (*
 	}, nil
 }
 
+// Button handlers
+
 func (h *Handlers) ButtonQueryHandler(query *tgbotapi.CallbackQuery) {
 	if query.Data == VerifyUserButton {
 		h.VerifyButtonQueryHandler(query)

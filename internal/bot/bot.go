@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"strings"
 
 	"github.com/elidotexe/esme/internal/bot/handlers"
 	"github.com/elidotexe/esme/internal/logger"
@@ -62,6 +63,8 @@ func (b *Bot) Start() {
 	b.logger.Info("Bot has been successfully started...")
 
 	for u := range b.updates {
+		infoCmd := strings.TrimSpace(strings.ToLower(u.Message.Command()))
+
 		if u.CallbackQuery != nil {
 			b.handlers.ButtonQueryHandler(u.CallbackQuery)
 		}
@@ -69,8 +72,8 @@ func (b *Bot) Start() {
 		switch {
 		case u.Message == nil:
 			continue
-		case u.Message.Command() == "info":
-			b.handlers.OnInfoCommand(u.Message)
+		case infoCmd == "info":
+			b.handlers.OnInfoCommand(u.Message, infoCmd)
 		case u.Message.NewChatMembers != nil:
 			b.handlers.OnUserJoined(u.Message)
 		case u.Message != nil:
