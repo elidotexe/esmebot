@@ -63,7 +63,7 @@ func (b *Bot) Start() {
 
 	for u := range b.updates {
 		if u.CallbackQuery != nil {
-			b.handlers.HandleButtonQuery(u.Message, u.CallbackQuery)
+			b.handlers.ButtonQueryHandler(u.CallbackQuery)
 		}
 
 		switch {
@@ -73,9 +73,10 @@ func (b *Bot) Start() {
 			b.handlers.OnInfoCommand(u.Message)
 		case u.Message.NewChatMembers != nil:
 			b.handlers.OnUserJoined(u.Message)
+		case u.Message != nil:
+			b.handlers.MessageHandler(u.Message)
 		default:
 			b.logger.Infof("%s, wrote: %s", u.Message.From.UserName, u.Message.Text)
-			b.handlers.HandleButtonQuery(u.Message, u.CallbackQuery)
 		}
 	}
 }
