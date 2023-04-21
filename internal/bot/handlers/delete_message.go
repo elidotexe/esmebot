@@ -8,7 +8,8 @@ import (
 
 // DeleteMsgDelayFiveMin is the time to wait before deleting a message
 const DeleteMsgDelayZeroMin = time.Second * 0
-const DeleteMsgDelayFiveMin = time.Second * 30
+const DeleteMsgDelayThirty = time.Second * 30
+const DeleteMsgDelayFiveMin = time.Minute * 5
 
 // DeleteMessage deletes a message by sending a request to the Telegram API
 // with a DeleteMessage command. It sleeps for DeleteMessageTime before making
