@@ -30,11 +30,11 @@ func NewBot(token string, logger *logger.Logger) (*Bot, error) {
 
 	logger.Info("Authorized on Telegram", zaplog.String("bot", bot.Self.UserName))
 
-	bot.Debug = false
+	bot.Debug = true
 
 	updates := bot.GetUpdatesChan(tgbotapi.UpdateConfig{
 		Offset:  0,
-		Timeout: 10,
+		Timeout: 60,
 	})
 
 	storage := storage.NewMemoryStorage()
@@ -70,8 +70,12 @@ func (b *Bot) Start() {
 			continue
 		case u.Message.Command() == "info":
 			b.handlers.OnInfoCommand(u.Message)
+		case u.Message.Command() == "ban":
+			b.handlers.OnBanUserCommand(u.Message)
 		case u.Message.NewChatMembers != nil:
 			b.handlers.OnUserJoined(u.Message)
+		case u.Message.LeftChatMember != nil:
+			b.handlers.OnUserLeft(u.Message)
 		case u.Message != nil:
 			b.handlers.MessageHandler(u.Message)
 		default:
