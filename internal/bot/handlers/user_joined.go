@@ -9,10 +9,12 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-var isUserHuman bool = false
+var isUserHuman bool
 
 func (h *Handlers) OnUserJoined(m *tgbotapi.Message) {
 	for _, user := range m.NewChatMembers {
+		isUserHuman = false
+
 		chatID := m.Chat.ID
 		userID := user.ID
 
@@ -83,10 +85,7 @@ func (h *Handlers) botIsAllowedToJoin(
 			return false, err
 		}
 
-		go h.DeleteMessage(
-			chatID,
-			sentMsg.MessageID,
-			DeleteMsgDelayFiveMin)
+		go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayFiveMin)
 
 		return false, nil
 	}
@@ -104,10 +103,7 @@ func getCaptchaMsgText(username, chatTitle string) string {
 func (h *Handlers) deleteCaptchaMessage(chatID int64, userID int64, msgID int) {
 	time.AfterFunc(DeleteMsgDelayFiveMin, func() {
 		if !isUserHuman {
-			h.DeleteMessage(
-				chatID,
-				msgID,
-				DeleteMsgDelayZeroMin)
+			h.DeleteMessage(chatID, msgID, DeleteMsgDelayZeroMin)
 
 			banChatMemberCfg := tgbotapi.BanChatMemberConfig{
 				ChatMemberConfig: tgbotapi.ChatMemberConfig{

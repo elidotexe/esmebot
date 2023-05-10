@@ -30,11 +30,11 @@ func NewBot(token string, logger *logger.Logger) (*Bot, error) {
 
 	logger.Info("Authorized on Telegram", zaplog.String("bot", bot.Self.UserName))
 
-	bot.Debug = true
+	bot.Debug = false
 
 	updates := bot.GetUpdatesChan(tgbotapi.UpdateConfig{
 		Offset:  0,
-		Timeout: 60,
+		Timeout: 10,
 	})
 
 	storage := storage.NewMemoryStorage()

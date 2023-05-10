@@ -48,6 +48,10 @@ func (h *Handlers) OnInfoCommand(m *tgbotapi.Message) {
 	var msgText string
 	msgText += fmt.Sprintf("4u %s 👽❤️\n\n", username)
 
+	if len(pr.PartyList) == 0 {
+		msgText = fmt.Sprintf("Sorry %s, I couldn't find any events for %s 😿", username, cmdArgs)
+	}
+
 	for _, e := range pr.PartyList {
 		msgText += getMsgText(e)
 
@@ -67,7 +71,7 @@ func (h *Handlers) OnInfoCommand(m *tgbotapi.Message) {
 		return
 	}
 
-	go h.DeleteMessage(chatID, m.MessageID, DeleteMsgDelayZeroMin)
+	// go h.DeleteMessage(chatID, m.MessageID, DeleteMsgDelayZeroMin)
 	go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayOneMin)
 }
 

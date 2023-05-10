@@ -17,7 +17,10 @@ type Handlers struct {
 
 // Initialize initializes a new instance of the Handlers struct with the provided BotAPI
 // and Logger, and returns it along with a nil error.
-func Initialize(b *tgbotapi.BotAPI, logger *logger.Logger, s storage.Storage) (*Handlers, error) {
+func Initialize(
+	b *tgbotapi.BotAPI,
+	logger *logger.Logger,
+	s storage.Storage) (*Handlers, error) {
 	return &Handlers{
 		bot:     b,
 		logger:  logger,

@@ -17,6 +17,7 @@ func (h *Handlers) MessageHandler(m *tgbotapi.Message) {
 		h.DeleteMessage(chatID, m.MessageID, DeleteMsgDelayZeroMin)
 		return
 	}
+
 	h.storage.Remove(chatID, userID)
 
 	go h.deleteMessages(m)
