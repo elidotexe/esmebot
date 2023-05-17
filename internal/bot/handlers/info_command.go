@@ -23,7 +23,8 @@ func (h *Handlers) OnInfoCommand(m *tgbotapi.Message) {
 
 	cmdArgs := strings.ToLower(m.CommandArguments())
 	if cmdArgs != "" {
-		escapedUrl := "https://www.goabase.net/api/party/json/?country=united%20kingdom&search="
+		escapedUrl := "https://www.goabase.net/api/party/json/?country=" +
+			"united%20kingdom&search="
 		goabaseAPI = fmt.Sprintf("%s%s", escapedUrl, cmdArgs)
 	}
 
@@ -49,7 +50,8 @@ func (h *Handlers) OnInfoCommand(m *tgbotapi.Message) {
 	msgText += fmt.Sprintf("4u %s 👽❤️\n\n", username)
 
 	if len(pr.PartyList) == 0 {
-		msgText = fmt.Sprintf("Sorry %s, I couldn't find any events for %s 😿", username, cmdArgs)
+		msgText = fmt.Sprintf("Sorry %s, "+
+			"I couldn't find any events for %s 😿", username, cmdArgs)
 	}
 
 	for _, e := range pr.PartyList {
@@ -71,8 +73,7 @@ func (h *Handlers) OnInfoCommand(m *tgbotapi.Message) {
 		return
 	}
 
-	// go h.DeleteMessage(chatID, m.MessageID, DeleteMsgDelayZeroMin)
-	go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayOneMin)
+	go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayThreeMin)
 }
 
 func (h *Handlers) GetAPIResponse(goabaseAPI string) (*http.Response, error) {
@@ -101,7 +102,13 @@ func getMsgText(e models.Event) string {
 		"*Country*: %s\n"+
 		"*Organiser*: %s\n"+
 		"*Link*: [More Info](%s) 🔗\n\n",
-		e.Name, stripoutDate(e.Date), e.Type, e.City, e.Country, stripoutOrganiser(e.Organiser), getEventLink(e))
+		e.Name,
+		stripoutDate(e.Date),
+		e.Type,
+		e.City,
+		e.Country,
+		stripoutOrganiser(e.Organiser),
+		getEventLink(e))
 }
 
 func stripoutDate(date string) string {

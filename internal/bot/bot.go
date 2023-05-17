@@ -30,11 +30,11 @@ func NewBot(token string, logger *logger.Logger) (*Bot, error) {
 
 	logger.Info("Authorized on Telegram", zaplog.String("bot", bot.Self.UserName))
 
-	bot.Debug = false
+	bot.Debug = true
 
 	updates := bot.GetUpdatesChan(tgbotapi.UpdateConfig{
 		Offset:  0,
-		Timeout: 10,
+		Timeout: 60,
 	})
 
 	storage := storage.NewMemoryStorage()
@@ -60,6 +60,9 @@ func NewBot(token string, logger *logger.Logger) (*Bot, error) {
 // message is of an unknown type, it logs an error message.
 func (b *Bot) Start() {
 	b.logger.Info("Bot has been successfully started...")
+
+	b.handlers.NotificationMessage()
+
 	for u := range b.updates {
 		if u.CallbackQuery != nil {
 			b.handlers.ButtonQueryHandler(u.CallbackQuery)
@@ -72,6 +75,10 @@ func (b *Bot) Start() {
 			b.handlers.OnInfoCommand(u.Message)
 		case u.Message.Command() == "ban":
 			b.handlers.OnBanUserCommand(u.Message)
+		case u.Message.Command() == "rules":
+			b.handlers.OnRulesCommand(u.Message)
+		case u.Message.Command() == "commands":
+			b.handlers.OnCmdsCommand(u.Message)
 		case u.Message.NewChatMembers != nil:
 			b.handlers.OnUserJoined(u.Message)
 		case u.Message.LeftChatMember != nil:

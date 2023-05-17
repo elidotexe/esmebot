@@ -5,6 +5,7 @@ import (
 	"time"
 
 	c "github.com/elidotexe/esme/internal/bot/common"
+	k "github.com/elidotexe/esme/internal/bot/keyboard"
 	"github.com/elidotexe/esme/internal/storage"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -42,7 +43,7 @@ func (h *Handlers) OnUserJoined(m *tgbotapi.Message) {
 		captchaMsgText := getCaptchaMsgText(username, m.Chat.Title)
 
 		msg := tgbotapi.NewMessage(chatID, captchaMsgText)
-		msg.ReplyMarkup = verifyKeyboard
+		msg.ReplyMarkup = k.CreateInlineKeyboard("I am a Human", VerifyUserButton)
 
 		sentMsg, err := h.bot.Send(msg)
 		if err != nil {
@@ -94,7 +95,7 @@ func (h *Handlers) botIsAllowedToJoin(
 }
 
 func getCaptchaMsgText(username, chatTitle string) string {
-	return fmt.Sprintf("Hi %s, welcome to the %s! (You have %sec)\n"+
+	return fmt.Sprintf("Hi %s, welcome to the %s! (You have %s)\n"+
 		"\n"+
 		"Please, press the button below within the specified time frame, otherwise you "+
 		"will be kicked. Thank you!", username, chatTitle, DeleteMsgDelayFiveMin.String())
