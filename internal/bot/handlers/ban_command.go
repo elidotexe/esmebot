@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	c "github.com/elidotexe/esme/internal/bot/common"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -23,13 +21,9 @@ func (h *Handlers) OnBanUserCommand(m *tgbotapi.Message) {
 		},
 	}
 
-	chat, err := h.bot.GetChatMember(chatMemberConfig)
+	_, err := h.bot.GetChatMember(chatMemberConfig)
 	if err != nil {
 		h.logger.Errorf("Error getting chat info: %s", err)
 		return
 	}
-
-	fmt.Println(chat)
-
-	// userID := c.GetUserID(h.bot, h.logger, userToBan)
 }

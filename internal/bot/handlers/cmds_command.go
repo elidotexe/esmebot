@@ -33,5 +33,7 @@ func (h *Handlers) OnCmdsCommand(m *tgbotapi.Message) {
 		return
 	}
 
-	go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayThreeMin)
+	go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayFiveMin)
+
+	go h.DeleteMessage(chatID, m.MessageID, DeleteMsgDelayFiveMin)
 }

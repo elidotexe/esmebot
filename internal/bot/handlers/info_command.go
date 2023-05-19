@@ -73,7 +73,9 @@ func (h *Handlers) OnInfoCommand(m *tgbotapi.Message) {
 		return
 	}
 
-	go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayThreeMin)
+	go h.DeleteMessage(chatID, sentMsg.MessageID, DeleteMsgDelayFiveMin)
+
+	go h.DeleteMessage(chatID, m.MessageID, DeleteMsgDelayFiveMin)
 }
 
 func (h *Handlers) GetAPIResponse(goabaseAPI string) (*http.Response, error) {

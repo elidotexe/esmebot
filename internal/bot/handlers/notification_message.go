@@ -7,7 +7,8 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-const ChatID = -1001628672322 // Test chat
+// const ChatID = -1001628672322 // Test chat
+const ChatID = -1001626631509 // Ravenexus
 
 func (h *Handlers) NotificationMessage() {
 	go func() {
@@ -42,7 +43,7 @@ func getRandomMessage() string {
 			"get additional traffic to your page, you can easily achieve this by adding " +
 			"your event to the https://goabase.net\n\n" +
 			"We are pulling the data from their API and all events are automatically added " +
-			"here in the chat. That's because we are wizards..🧙👽",
+			"here in the chat. Yes, we are wizards..🧙👽",
 
 		"📢*Feel free to share information about music/art events in this group without* " +
 			"*requiring prior permission*.\n\n" +
@@ -58,6 +59,17 @@ func getRandomMessage() string {
 		"🤓I have nothing better to do with my time, but code...\n" +
 			"I can buld you a custom bot for your group and make it do whatever you want.\n\n" +
 			"Hit me up if you're interested: @elicodesbot",
+
+		"👾Please note that this group has an open link policy, which means " +
+			"that anyone with the link can join. If you plan on hosting an underground " +
+			"event, I recommend implementing some form of verification before granting " +
+			"access to your 'secret' chats.\n",
+
+		"👽We encourage you to invite your closest friends to join this group. The link to " +
+			"the group is in our bio - simply copy and send it to your friend! Please note that " +
+			"the group has an anti-bot captcha verification system that is valid for 5 minutes. " +
+			"New users must press the verification button within this time frame, otherwise, " +
+			"they will be automatically removed from the group.",
 	}
 
 	rand.Seed(time.Now().UnixNano())
