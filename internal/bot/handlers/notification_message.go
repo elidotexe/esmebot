@@ -7,13 +7,10 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-// const ChatID = -1001628672322 // Test chat
-const ChatID = -1001626631509 // Ravenexus
-
 func (h *Handlers) NotificationMessage() {
 	go func() {
 		for {
-			msg := tgbotapi.NewMessage(ChatID, getRandomMessage())
+			msg := tgbotapi.NewMessage(RavenexusID, getRandomMessage())
 			msg.DisableWebPagePreview = true
 			msg.ParseMode = "markdown"
 

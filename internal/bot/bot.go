@@ -79,7 +79,8 @@ func (b *Bot) Start() {
 			b.handlers.OnRulesCommand(u.Message)
 		case u.Message.Command() == "commands":
 			b.handlers.OnCmdsCommand(u.Message)
-		case u.Message.Command() == "post":
+		case u.Message.Command() == "post" ||
+			u.Message.Command() == "post" && u.Message.Chat.IsPrivate():
 			b.handlers.OnPostCommand(u.Message)
 		case u.Message.NewChatMembers != nil:
 			b.handlers.OnUserJoined(u.Message)

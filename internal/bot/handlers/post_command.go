@@ -8,12 +8,10 @@ import (
 )
 
 func (h *Handlers) OnPostCommand(m *tgbotapi.Message) {
-	chatID := m.Chat.ID
-
 	username := c.GetUsername(m.From)
 	userIsAdmin := c.IsAdmin(m, h.bot, h.logger)
 
-	if !userIsAdmin {
+	if !userIsAdmin && m.From.ID != 1087968824 { // annonimous group user ID
 		h.logger.Infof("User %s is not an admin", username)
 		return
 	}
@@ -27,7 +25,7 @@ func (h *Handlers) OnPostCommand(m *tgbotapi.Message) {
 	}
 
 	postMsg := args[1]
-	msg := tgbotapi.NewMessage(chatID, postMsg)
+	msg := tgbotapi.NewMessage(RavenexusID, postMsg)
 
 	_, err := h.bot.Send(msg)
 	if err != nil {
@@ -35,5 +33,5 @@ func (h *Handlers) OnPostCommand(m *tgbotapi.Message) {
 		return
 	}
 
-	go h.DeleteMessage(chatID, m.MessageID, DeleteMsgDelayZeroMin)
+	go h.DeleteMessage(RavenexusID, m.MessageID, DeleteMsgDelayZeroMin)
 }

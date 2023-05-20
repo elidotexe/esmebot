@@ -115,6 +115,8 @@ func (h *Handlers) deleteCaptchaMessage(chatID int64, userID int64, msgID int) {
 			}
 
 			h.bot.Request(banChatMemberCfg)
+
+			h.storage.Remove(chatID, userID)
 		}
 	})
 }
