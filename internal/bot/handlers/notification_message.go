@@ -53,10 +53,6 @@ func getRandomMessage() string {
 			"Stay tuned as I'm currently exploring Skiddle's API, and more events will be " +
 			"added soon to the existing event list.",
 
-		"🤓I have nothing better to do with my time, but code...\n" +
-			"I can buld you a custom bot for your group and make it do whatever you want.\n\n" +
-			"Hit me up if you're interested: @elicodesbot",
-
 		"👾Please note that this group has an open link policy, which means " +
 			"that anyone with the link can join. If you plan on hosting an underground " +
 			"event, I recommend implementing some form of verification before granting " +

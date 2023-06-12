@@ -132,15 +132,6 @@ func getEventLink(e models.Event) string {
 	const SkiddleURL = "https://www.skiddle.com/"
 	const Tag = "?sktag=15145"
 
-	// Will be removed when the event is over
-	if e.ID == 110366 {
-		return fmt.Sprintf("%s%d%s", SkiddleURL+"e/", 36327598, Tag)
-	}
-	// Will be removed when the event is over
-	if e.ID == 109820 {
-		return fmt.Sprintf("%s%d%s", SkiddleURL+"e/", 36224871, Tag)
-	}
-
 	if e.URL != "" {
 		if strings.Contains(e.URL, "skiddle") {
 			re := regexp.MustCompile(`\d{8}`)

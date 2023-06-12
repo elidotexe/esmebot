@@ -11,8 +11,8 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-const RavenexusID = -1001628672322 // Test chat
-// const RavenexusID = -1001626631509 // Ravenexus
+// const RavenexusID = -1001628672322 // Test chat
+const RavenexusID = -1001626631509 // Ravenexus
 
 // Button constants
 const VerifyUserButton = "verify"
